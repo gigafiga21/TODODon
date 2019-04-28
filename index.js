@@ -66,6 +66,7 @@ class App {
      */
     initSettings () {
         this.cutTableRows = true;
+        this.ignore = [];
     }
 
     /**
@@ -114,21 +115,23 @@ class App {
 
         while (counter < command.length) {
             if (command[counter][0] == '-') {
-                switch (command[counter]) {
-                    case '-nocut':
-                        this.cutTableRows = false;
-                        break;
-                    default:
-                        console.writeLine('Unrecognized flag \"' + command[counter] + '\". Skipping...');
-                        break;
+                if (command[counter] == '-nocut') {
+                    this.cutTableRows = false;
                 }
+                else if (command[counter].slice(0, 7) == '-ignore') {
+                    this.ignore = command[counter].slice(8).replace('"', '').split(';');
+                }
+                else {
+                    console.writeLine('Unrecognized flag \"' + command[counter] + '\". Skipping...');
+                }
+
                 command.splice(counter, 1);
             } else {
                 counter++;
             }
         }
 
-        this.files = directory.getAllFilePathsWithExtension(process.cwd(), 'js').map(path => {
+        this.files = directory.getAllFilePathsWithExtension(process.cwd(), 'js', [], this.ignore).map(path => {
                 let file = new directory.File(path);
                 file.readin();
                 return file;
@@ -170,8 +173,6 @@ class App {
                 process.exit(0);
                 break;
         }
-
-        this.initSettings();
     }
 };
 
