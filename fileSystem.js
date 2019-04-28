@@ -5,19 +5,34 @@ const fs = require('fs');
  * @param  {String} directoryPath - path to directory opened in console
  * @param  {String} extension     - extension of the file to search
  * @param  {Array}  filePaths     - array to store found paths
+ * @param  {Array}  ignore        - array of path masks to be ignored
  * @return {Array}
  */
-function getAllFilePathsWithExtension(directoryPath, extension, filePaths) {
+function getAllFilePathsWithExtension(directoryPath, extension, filePaths, ignore) {
     filePaths = filePaths || [];
     const fileNames = fs.readdirSync(directoryPath);
     for (const fileName of fileNames) {
         const filePath = directoryPath + '/' + fileName;
+        let ignored = false;
+
+        for (const prohibited of ignore) {
+            const mask = new RegExp(ignore);
+            if (mask.test()) {
+                ignored = true;
+                break;
+            }
+        }
+        if (ignored) {
+            continue;
+        }
+
         if (fs.statSync(filePath).isDirectory()) {
-            getAllFilePathsWithExtension(filePath, extension, filePaths);
+            getAllFilePathsWithExtension(filePath, extension, filePaths, ignore);
         } else if (filePath.endsWith(`.${extension}`)) {
             filePaths.push(filePath);
         }
     }
+
     return filePaths;
 }
 
