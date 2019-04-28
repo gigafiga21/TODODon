@@ -17,7 +17,7 @@ function getAllFilePathsWithExtension(directoryPath, extension, filePaths, ignor
 
         for (const prohibited of ignore) {
             const mask = new RegExp(ignore);
-            if (mask.test()) {
+            if (mask.test(filePath)) {
                 ignored = true;
                 break;
             }
