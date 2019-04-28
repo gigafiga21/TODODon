@@ -81,11 +81,6 @@ class App {
 
         console.onEnd(this.processCommand.bind(null, 'exit'));
         this.initSettings();
-        this.files = directory.getAllFilePathsWithExtension(process.cwd(), 'js').map(path => {
-                let file = new directory.File(path);
-                file.readin();
-                return file;
-            });
 
         let drawing = require('./respects.txt').split('$$');
         this.respects = {
@@ -132,6 +127,12 @@ class App {
                 counter++;
             }
         }
+
+        this.files = directory.getAllFilePathsWithExtension(process.cwd(), 'js').map(path => {
+                let file = new directory.File(path);
+                file.readin();
+                return file;
+            });
 
         switch (command[0]) {
             case 'show':
