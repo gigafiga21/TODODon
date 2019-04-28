@@ -110,11 +110,7 @@ class App {
         if (command.length > 2) {
             this.processCommand(command.slice(2).join(' '));
             this.processCommand('exit');
-            return;
         }
-
-        console.writeLine('Please, write your command!\x1b[31m');
-        console.readLine(this.processCommand.bind(this));
     }
 
     /**
