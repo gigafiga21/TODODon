@@ -49,6 +49,11 @@ function generateTable(data, cutTableRows) {
     table.setSplit(!cutTableRows);
     table.setMaxColumnLength([1, 10, 10, 50, 15]);
     table.setMinColumnLength([1, 6, 10, 20, 9]);
+
+    if (!cutTableRows)
+    {
+        table.setSeparators({horizontal: ' ', cross: '│', rightCross: '│', leftCross: '│'});
+    }
     table.draw();
 }
 
