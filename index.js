@@ -45,18 +45,8 @@ function formData(found) {
  * @param {Boolean}        cutTableRows - if true then strings which not match cells widths will be cutted
  */
 function generateTable(data, cutTableRows) {
-    var separators;
-    if (!this.drawFrame) {
-        separators = {
-            vertical: '|', verticalBorder: '', horizontalBorder: ' ',
-            cross: '', topCross: '', bottomCross: '', leftCross: '-', rightCross: '-',
-            topLeft: '', topRight: '', bottomLeft: '', bottomRight: '', header: '-'
-        }
-    }
-
     let table = new Table(['!', 'user', 'date', 'comment', 'file name'], data.map((quant) => formOutput(quant)));
     table.setSplit(!cutTableRows);
-    table.setSeparators(separators);
     table.setMaxColumnLength([1, 10, 10, 50, 15]);
     table.setMinColumnLength([1, 6, 10, 20, 9]);
     table.draw();
@@ -71,7 +61,6 @@ class App {
      */
     initSettings () {
         this.cutTableRows = true;
-        this.drawFrame = false;
     }
 
     /**
@@ -128,9 +117,6 @@ class App {
                 switch (command[counter]) {
                     case '-nocut':
                         this.cutTableRows = false;
-                        break;
-                    case '-frame':
-                        this.drawFrame = true;
                         break;
                     default:
                         console.writeLine('Unrecognized flag \"' + command[counter] + '\". Skipping...');
