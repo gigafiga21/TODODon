@@ -1,4 +1,3 @@
-const path = require('path');
 const directory = require('./fileSystem');
 const console   = require('./console');
 const engine  = require('./engine');
@@ -66,6 +65,7 @@ class App {
      */
     initSettings () {
         this.cutTableRows = true;
+        this.ignore = [];
     }
 
     /**
@@ -81,11 +81,6 @@ class App {
 
         console.onEnd(this.processCommand.bind(null, 'exit'));
         this.initSettings();
-        this.files = directory.getAllFilePathsWithExtension(process.cwd(), 'js').map(path => {
-                let file = new directory.File(path);
-                file.readin();
-                return file;
-            });
 
         let drawing = require('./respects.txt').split('$$');
         this.respects = {
@@ -119,19 +114,44 @@ class App {
 
         while (counter < command.length) {
             if (command[counter][0] == '-') {
-                switch (command[counter]) {
-                    case '-nocut':
-                        this.cutTableRows = false;
-                        break;
-                    default:
-                        console.writeLine('Unrecognized flag \"' + command[counter] + '\". Skipping...');
-                        break;
+                if (command[counter] == '-nocut') {
+                    this.cutTableRows = false;
                 }
+                else if (command[counter].slice(0, 7) == '-ignore') {
+                    this.ignore = command[counter].slice(8);
+                    this.ignore = this.ignore.replace(/[\.\?\*"\\]/g,
+                        (symbol) => {
+                            switch (symbol) {
+                                case '.':
+                                    return '\.';
+                                case '?':
+                                    return '.?';
+                                case '*':
+                                    return '.*';
+                                case '"':
+                                    return '';
+                                case '\\':
+                                    return '/';
+                            }
+                        });
+                    this.ignore = this.ignore.split(';');
+                }
+                else {
+                    console.writeLine('Unrecognized flag \"' + command[counter] + '\". Skipping...');
+                }
+
                 command.splice(counter, 1);
             } else {
                 counter++;
             }
         }
+
+        let workdir = process.cwd().replace(/\\/g, '/');
+        this.files = directory.getAllFilePathsWithExtension(workdir, 'js', [], this.ignore).map(path => {
+                let file = new directory.File(path);
+                file.readin();
+                return file;
+            });
 
         switch (command[0]) {
             case 'show':
@@ -169,8 +189,6 @@ class App {
                 process.exit(0);
                 break;
         }
-
-        this.initSettings();
     }
 };
 
