@@ -45,20 +45,15 @@ function formData(found) {
  * @param {Boolean}        cutTableRows - if true then strings which not match cells widths will be cutted
  */
 function generateTable(data, cutTableRows) {
-    var separators;
-    if (!this.drawFrame) {
-        separators = {
-            vertical: '|', verticalBorder: '', horizontalBorder: ' ',
-            cross: '', topCross: '', bottomCross: '', leftCross: '-', rightCross: '-',
-            topLeft: '', topRight: '', bottomLeft: '', bottomRight: '', header: '-'
-        }
-    }
-
     let table = new Table(['!', 'user', 'date', 'comment', 'file name'], data.map((quant) => formOutput(quant)));
     table.setSplit(!cutTableRows);
-    table.setSeparators(separators);
     table.setMaxColumnLength([1, 10, 10, 50, 15]);
     table.setMinColumnLength([1, 6, 10, 20, 9]);
+
+    if (!cutTableRows)
+    {
+        table.setSeparators({horizontal: ' ', cross: '│', rightCross: '│', leftCross: '│'});
+    }
     table.draw();
 }
 
@@ -71,7 +66,6 @@ class App {
      */
     initSettings () {
         this.cutTableRows = true;
-        this.drawFrame = false;
     }
 
     /**
@@ -79,8 +73,13 @@ class App {
      * @constructor
      */
     constructor () {
-        console.onEnd(this.processCommand.bind(null, 'exit'));
+        if (process.argv.length < 3)
+        {
+            process.exit(0);
+            return;
+        }
 
+        console.onEnd(this.processCommand.bind(null, 'exit'));
         this.initSettings();
         this.files = directory.getAllFilePathsWithExtension(process.cwd(), 'js').map(path => {
                 let file = new directory.File(path);
@@ -106,39 +105,26 @@ class App {
          *       └──┘
          */
 
-        let command = process.argv;
-        if (command.length > 2) {
-            this.processCommand(command.slice(2).join(' '));
-            this.processCommand('exit');
-            return;
-        }
-
-        console.writeLine('Please, write your command!\x1b[31m');
-        console.readLine(this.processCommand.bind(this));
+        this.processCommand(process.argv.slice(2));
+        process.exit(0);
     }
 
     /**
      * Waits for command in the console and parses it
-     * @param {String} command - command (1-2 keywords and 0-1 flag)
+     * @param {Array} command - command (1-2 keywords and 0-1 flag)
      */
     processCommand(command) {
         let counter = 1,
             found;
 
-        console.write('\x1b[0m');
-
-        command = command.split(' ');
         while (counter < command.length) {
             if (command[counter][0] == '-') {
                 switch (command[counter]) {
                     case '-nocut':
                         this.cutTableRows = false;
                         break;
-                    case '-frame':
-                        this.drawFrame = true;
-                        break;
                     default:
-                        console.writeLine('\x1b[1mUnrecognized flag \"' + command[counter] + '\". Skipping...\x1b[0m');
+                        console.writeLine('Unrecognized flag \"' + command[counter] + '\". Skipping...');
                         break;
                 }
                 command.splice(counter, 1);
@@ -169,25 +155,22 @@ class App {
                 generateTable.call(this, found, this.cutTableRows);
                 break;
             case 'F':
-                console.writeLine('\x1b[1mRespects payed\n');
+                console.writeLine('Respects payed\n');
                 let max = 0;
                 for (const width in this.respects) {
                     if (width <= process.stdout.columns && width > max) {
                         max = width;
                     }
                 }
-                console.writeLine(this.respects[max] + '\x1b[0m');
-                break;
-            case 'exit':
-                process.exit(0);
+                console.writeLine(this.respects[max]);
                 break;
             default:
-                console.writeLine('wrong command');
+                console.writeLine('Wrong command');
+                process.exit(0);
                 break;
         }
 
         this.initSettings();
-        console.write('\x1b[31m');
     }
 };
 
