@@ -1,0 +1,17 @@
+{
+  "name": "TODODON",
+  "version": "1.0.0",
+  "description": "Searches and sorts TODO comments in current directory",
+  "main": "index.js",
+  "scripts": {
+    "build": "webpack"
+  },
+  "author": "gigafiga21",
+  "devDependencies": {
+    "raw-loader": "^1.0.0",
+    "terser-webpack-plugin": "^1.2.2",
+    "webpack": "^4.29.3",
+    "webpack-cli": "^3.2.3"
+  },
+  "dependencies": {}
+}
