@@ -16,7 +16,7 @@ function searchTODO(files, mask) {
             regexp = /\/\/[\t ]*TODO ?:? *[^\n]*!.*\n/ig;
             break;
         default:
-            regexp = RegExp('\/\/[\t ]*TODO ?:? *' + mask + '[^;\n]*;.*\n', 'ig');
+            regexp = new RegExp('\/\/[\t ]*TODO ?:? *' + mask + '[^;\n]*;.*\n', 'ig');
             break;
     }
 
