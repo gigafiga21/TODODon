@@ -68,6 +68,10 @@ function absolute(path) {
         upper = path.indexOf('../');
     }
 
+    if (!fs.existsSync(path)) {
+        path = null;
+    }
+
     return path;
 }
 
