@@ -1,3 +1,4 @@
+const path = require('path');
 const directory = require('./fileSystem');
 const console   = require('./console');
 const engine  = require('./engine');
@@ -66,6 +67,7 @@ class App {
     initSettings () {
         this.cutTableRows = true;
         this.ignore = [];
+        this.target = '';
     }
 
     /**
@@ -119,22 +121,23 @@ class App {
                 }
                 else if (command[counter].slice(0, 7) == '-ignore') {
                     this.ignore = command[counter].slice(8);
-                    this.ignore = this.ignore.replace(/[\.\?\*"\\]/g,
+                    this.ignore = this.ignore.replace(/[\[\^\$\+\(\)\.\+\?\*\\]/g,
                         (symbol) => {
                             switch (symbol) {
-                                case '.':
-                                    return '\.';
                                 case '?':
                                     return '.?';
                                 case '*':
                                     return '.*';
-                                case '"':
-                                    return '';
                                 case '\\':
                                     return '/';
+                                default:
+                                    return '\\' + symbol;
                             }
                         });
                     this.ignore = this.ignore.split(';');
+                }
+                else if (command[counter].slice(0, 7) == '-target') {
+                    this.target = command[counter].slice(8);
                 }
                 else {
                     console.writeLine('Unrecognized flag \"' + command[counter] + '\". Skipping...');
@@ -146,7 +149,12 @@ class App {
             }
         }
 
-        let workdir = process.cwd().replace(/\\/g, '/');
+        let workdir = directory.absolute(this.target);
+        if (workdir == null) {
+            console.writeLine('Wrong target path');
+            process.exit(0);
+        }
+
         this.files = directory.getAllFilePathsWithExtension(workdir, 'js', [], this.ignore).map(path => {
                 let file = new directory.File(path);
                 file.readin();

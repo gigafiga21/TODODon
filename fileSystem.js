@@ -1,4 +1,5 @@
 const fs = require('fs');
+const os = require('os');
 
 /**
  * Searches all file paths by given extension
@@ -16,7 +17,11 @@ function getAllFilePathsWithExtension(directoryPath, extension, filePaths, ignor
         let ignored = false;
 
         for (const prohibited of ignore) {
-            const mask = new RegExp(directoryPath + ".*/" + prohibited + '$');
+            let mask = directoryPath.replace(/[\[\^\$\+\(\)\.]/g,
+                (symbol) => {
+                    return '\\' + symbol;
+                });
+            mask = new RegExp(mask + ".*/" + prohibited + '$');
             if (mask.test(filePath)) {
                 ignored = true;
                 break;
@@ -46,6 +51,36 @@ function readFile(filePath) {
 }
 
 /**
+ * Converts relative path into absolute one
+ * @param  {String}      path - relative path
+ * @return {String|Null}      - converted path or null if path is invalid
+ */
+function absolute(path) {
+    if (os.platform() == 'win32' && path.indexOf(':') != -1 || os.platform() != 'win32' && path[0] == '/') {
+        path = path.replace(/\\/g, '/');
+    } else {
+        path = (process.cwd() + '/' + path).replace(/\\/g, '/');
+    }
+
+    let upper = path.indexOf('../');
+    while (upper != -1) {
+        if (upper < 3 || path[upper - 2] == ':') {
+            return null;
+        }
+
+        let previous = path.lastIndexOf('/', upper - 2);
+        path = path.slice(0, previous + 1) + path.slice(upper + 3);
+        upper = path.indexOf('../');
+    }
+
+    if (!fs.existsSync(path)) {
+        path = null;
+    }
+
+    return path;
+}
+
+/**
  * Saves information about file
  * @prop {String} content - content of the file
  * @prop {String} path    - path to the file
@@ -69,5 +104,6 @@ class File {
 
 module.exports = {
     File,
-    getAllFilePathsWithExtension
+    getAllFilePathsWithExtension,
+    absolute
 };
