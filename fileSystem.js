@@ -1,4 +1,5 @@
 const fs = require('fs');
+const os = require('os');
 
 /**
  * Searches all file paths by given extension
@@ -16,7 +17,11 @@ function getAllFilePathsWithExtension(directoryPath, extension, filePaths, ignor
         let ignored = false;
 
         for (const prohibited of ignore) {
-            const mask = new RegExp(directoryPath + ".*/" + prohibited + '$');
+            let mask = directoryPath.replace(/[\[\^\$\+\(\)\.]/g,
+                (symbol) => {
+                    return '\\' + symbol;
+                });
+            mask = new RegExp(mask + ".*/" + prohibited + '$');
             if (mask.test(filePath)) {
                 ignored = true;
                 break;
@@ -51,10 +56,10 @@ function readFile(filePath) {
  * @return {String|Null}      - converted path or null if path is invalid
  */
 function absolute(path) {
-    if (path[0] != '/' && path.indexOf(':') == -1) {
-        path = (process.cwd() + '/' + path).replace(/\\/g, '/');
-    } else {
+    if (os.platform() == 'win32' && path.indexOf(':') != -1 || os.platform() != 'win32' && path[0] == '/') {
         path = path.replace(/\\/g, '/');
+    } else {
+        path = (process.cwd() + '/' + path).replace(/\\/g, '/');
     }
 
     let upper = path.indexOf('../');
