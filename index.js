@@ -130,8 +130,6 @@ class App {
                                     return '.?';
                                 case '*':
                                     return '.*';
-                                case '"':
-                                    return '';
                                 case '\\':
                                     return '/';
                             }
