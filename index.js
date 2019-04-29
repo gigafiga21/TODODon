@@ -121,17 +121,17 @@ class App {
                 }
                 else if (command[counter].slice(0, 7) == '-ignore') {
                     this.ignore = command[counter].slice(8);
-                    this.ignore = this.ignore.replace(/[\.\?\*"\\]/g,
+                    this.ignore = this.ignore.replace(/[\[\^\$\+\(\)\.\+\?\*\\]/g,
                         (symbol) => {
                             switch (symbol) {
-                                case '.':
-                                    return '\.';
                                 case '?':
                                     return '.?';
                                 case '*':
                                     return '.*';
                                 case '\\':
                                     return '/';
+                                default:
+                                    return '\\' + symbol;
                             }
                         });
                     this.ignore = this.ignore.split(';');
