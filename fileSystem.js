@@ -51,7 +51,11 @@ function readFile(filePath) {
  * @return {String|Null}      - converted path or null if path is invalid
  */
 function absolute(path) {
-    path = (process.cwd() + '/' + path).replace(/\\/g, '/');
+    if (path[0] != '/' && path.indexOf(':') == -1) {
+        path = (process.cwd() + '/' + path).replace(/\\/g, '/');
+    } else {
+        path = path.replace(/\\/g, '/');
+    }
 
     let upper = path.indexOf('../');
     while (upper != -1) {
