@@ -53,5 +53,5 @@ For the file structure given below and current location in `/proj/bin`:
 
 `tododon <command>` - will process all TODO comments in `bin.js`  
 `tododon <command> -target=../` - will process all TODO comments in files contained in `/proj` dir and in its subdirs  
-`tododon <command> -target=../ -ignore=node_modules` - like the previous one, but everything in `node_modules` will be ignored
+`tododon <command> -target=../ -ignore=node_modules` - like the previous one, but everything in `node_modules` will be ignored  
 `tododon <command> -target=../ -ignore=node_modules;.git` - ignoring `node_modules` and `.git` dirs
